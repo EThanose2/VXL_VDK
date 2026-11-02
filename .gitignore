@@ -1,0 +1,44 @@
+# Backup files
+*Backup*
+Backup of *
+*.bak
+*.old
+*.pdsbak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+
+# Last Loaded files
+*Last Loaded*
+Last Loaded*
+
+# Proteus
+*.pdsbak
+*.workspace
+
+# Keil
+*.uvguix.*
+*.uvgui.*
+Listings/
+Objects/
+
+# STM32CubeIDE
+Debug/
+Release/
+.settings/
+*.launch
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# System files
+.DS_Store
