@@ -1,44 +1,47 @@
-# Backup files
+# =================================
+# BACKUP FILES
+# =================================
 *Backup*
 Backup of *
 *.bak
 *.old
 *.pdsbak
 *.backup
+*.orig
 
-# Temporary files
+# =================================
+# TEMPORARY FILES
+# =================================
 *.tmp
 *.temp
 *.log
 *.swp
 *.swo
-
-# Last Loaded files
 *Last Loaded*
-Last Loaded*
 
-# Proteus
-*.pdsbak
+# =================================
+# PROTEUS
+# =================================
 *.workspace
 
-# Keil
+# =================================
+# KEIL
+# =================================
 *.uvguix.*
 *.uvgui.*
-Listings/
-Objects/
 
-# STM32CubeIDE
+# =================================
+# STM32 CUBEIDE
+# =================================
 Debug/
 Release/
 .settings/
-*.launch
 
-# VS Code
-.vscode/
-
-# Windows
+# =================================
+# WINDOWS
+# =================================
 Thumbs.db
 Desktop.ini
 
-# System files
-.DS_Store
+# Assembly files
+*.asm
