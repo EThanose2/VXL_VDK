@@ -82,32 +82,23 @@ volatile int timer0_counter = 0;
 volatile int timer0_flag = 0;
 volatile int timer1_counter = 0;
 volatile int timer1_flag = 0;
+volatile int timer2_counter = 0;
+volatile int timer2_flag = 0;
+volatile int timer3_counter = 0;
+volatile int timer3_flag = 0;
 int TIMER_CYCLE = 5;   // must match the timer interrupt period (5 ms)
 
-void setTimer0(int duration)
-{
-    timer0_counter = duration / TIMER_CYCLE;
-    timer0_flag = 0;
-}
-
-void setTimer1(int duration)
-{
-    timer1_counter = duration / TIMER_CYCLE;
-    timer1_flag = 0;
-}
+void setTimer0(int duration) { timer0_counter = duration / TIMER_CYCLE; timer0_flag = 0; }
+void setTimer1(int duration) { timer1_counter = duration / TIMER_CYCLE; timer1_flag = 0; }
+void setTimer2(int duration) { timer2_counter = duration / TIMER_CYCLE; timer2_flag = 0; }
+void setTimer3(int duration) { timer3_counter = duration / TIMER_CYCLE; timer3_flag = 0; }
 
 void timer_run(void)
 {
-    if (timer0_counter > 0)
-    {
-        timer0_counter--;
-        if (timer0_counter == 0) timer0_flag = 1;
-    }
-    if (timer1_counter > 0)
-    {
-        timer1_counter--;
-        if (timer1_counter == 0) timer1_flag = 1;
-    }
+    if (timer0_counter > 0) { timer0_counter--; if (timer0_counter == 0) timer0_flag = 1; }
+    if (timer1_counter > 0) { timer1_counter--; if (timer1_counter == 0) timer1_flag = 1; }
+    if (timer2_counter > 0) { timer2_counter--; if (timer2_counter == 0) timer2_flag = 1; }
+    if (timer3_counter > 0) { timer3_counter--; if (timer3_counter == 0) timer3_flag = 1; }
 }
 
 // ---- Exercise 9: LED matrix ----
@@ -156,8 +147,10 @@ int main(void)
 
   /* USER CODE BEGIN WHILE */
   updateClockBuffer();
-  setTimer0(1000);   // clock: 1 second
+  setTimer0(1000);   // clock: 1 s
   setTimer1(10);     // matrix: 10 ms per column
+  setTimer2(1000);   // DOT: 1 s
+  setTimer3(5);      // 7-seg scan: 5 ms
   while (1)
   {
       // ---- Digital clock (1 s) ----
@@ -178,6 +171,21 @@ int main(void)
           updateLEDMatrix(index_led_matrix);
           index_led_matrix++;
           if (index_led_matrix >= MAX_LED_MATRIX) index_led_matrix = 0;
+      }
+
+      // ---- DOT (1 s) ----
+      if (timer2_flag == 1)
+      {
+          setTimer2(1000);
+          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+      }
+
+      // ---- 7-seg scan (5 ms) ----
+      if (timer3_flag == 1)
+      {
+          setTimer3(5);
+          update7SEG(index_led++);
+          if (index_led >= MAX_LED) index_led = 0;
       }
   }
   /* USER CODE END WHILE */
@@ -279,25 +287,11 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-uint8_t dot_counter = 0;   // counts 5 ms ticks for DOT blinking
-
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim->Instance == TIM2)
     {
         timer_run();
-
-        // DOT (PA4): toggle every 1 second = 200 ticks
-        dot_counter++;
-        if (dot_counter >= 200)
-        {
-            dot_counter = 0;
-            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
-        }
-
-        // Scan 7-seg every 5 ms
-        update7SEG(index_led++);
-        if (index_led >= MAX_LED) index_led = 0;
     }
 }
 
