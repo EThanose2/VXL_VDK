@@ -86,12 +86,15 @@ volatile int timer2_counter = 0;
 volatile int timer2_flag = 0;
 volatile int timer3_counter = 0;
 volatile int timer3_flag = 0;
+volatile int timer4_counter = 0;
+volatile int timer4_flag = 0;
 int TIMER_CYCLE = 5;   // must match the timer interrupt period (5 ms)
 
 void setTimer0(int duration) { timer0_counter = duration / TIMER_CYCLE; timer0_flag = 0; }
 void setTimer1(int duration) { timer1_counter = duration / TIMER_CYCLE; timer1_flag = 0; }
 void setTimer2(int duration) { timer2_counter = duration / TIMER_CYCLE; timer2_flag = 0; }
 void setTimer3(int duration) { timer3_counter = duration / TIMER_CYCLE; timer3_flag = 0; }
+void setTimer4(int duration) { timer4_counter = duration / TIMER_CYCLE; timer4_flag = 0; }
 
 void timer_run(void)
 {
@@ -99,6 +102,7 @@ void timer_run(void)
     if (timer1_counter > 0) { timer1_counter--; if (timer1_counter == 0) timer1_flag = 1; }
     if (timer2_counter > 0) { timer2_counter--; if (timer2_counter == 0) timer2_flag = 1; }
     if (timer3_counter > 0) { timer3_counter--; if (timer3_counter == 0) timer3_flag = 1; }
+    if (timer4_counter > 0) { timer4_counter--; if (timer4_counter == 0) timer4_flag = 1; }
 }
 
 // ---- Exercise 9: LED matrix ----
@@ -130,6 +134,16 @@ void updateLEDMatrix(int index)
         displayColumn(index);
     }
 }
+
+void shiftLeftMatrix(void)
+{
+    uint8_t first = matrix_buffer[0];          // giữ cột đầu
+    for (int i = 0; i < MAX_LED_MATRIX - 1; i++)
+    {
+        matrix_buffer[i] = matrix_buffer[i + 1];   // mỗi cột nhận nội dung cột bên phải
+    }
+    matrix_buffer[MAX_LED_MATRIX - 1] = first;     // cột đầu chạy vòng ra cuối
+}
 /* USER CODE END 0 */
 
 int main(void)
@@ -151,6 +165,7 @@ int main(void)
   setTimer1(10);     // matrix: 10 ms per column
   setTimer2(1000);   // DOT: 1 s
   setTimer3(5);      // 7-seg scan: 5 ms
+  setTimer4(500);
   while (1)
   {
       // ---- Digital clock (1 s) ----
@@ -186,6 +201,11 @@ int main(void)
           setTimer3(5);
           update7SEG(index_led++);
           if (index_led >= MAX_LED) index_led = 0;
+      }
+      if (timer4_flag == 1)
+      {
+          setTimer4(500);
+          shiftLeftMatrix();
       }
   }
   /* USER CODE END WHILE */
